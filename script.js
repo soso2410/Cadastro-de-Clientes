@@ -1,18 +1,16 @@
-$(document).ready(function() {
-    // Aplica a máscara no campo CEP
+$(document).ready(function () {
+
     $('#cep').mask('00000-000');
 
+    $('#cep').on('blur', function () {
+        var cep = $(this).val().replace(/\D/g, '');
 
-    $('#cep').on('blur', function() {
-        var cep = $(this).val().replace(/\D/g, ''); 
-
-        
         if (cep.length === 8) {
             $.ajax({
                 url: 'https://viacep.com.br/ws/' + cep + '/json/',
                 type: 'GET',
                 dataType: 'json',
-                success: function(data) {
+                success: function (data) {
                     if (!data.erro) {
                         $('#endereco').val(data.logradouro || '');
                         $('#bairro').val(data.bairro || '');
@@ -24,14 +22,10 @@ $(document).ready(function() {
         }
     });
 
-    
+
     var contador = 1;
-
-    
-    $('form').on('submit', function(e) {
-        e.preventDefault(); 
-
-        
+    $('form').on('submit', function (e) {
+        e.preventDefault();
         var nome = $('#nome').val();
         var sobrenome = $('#sobrenome').val();
         var nomeCompleto = nome + ' ' + sobrenome;
@@ -42,8 +36,6 @@ $(document).ready(function() {
         var bairro = $('#bairro').val();
         var cidade = $('#cidade').val();
         var estado = $('#estado').val();
-
-        
         var table = $('table');
         var tbody = table.find('tbody');
         if (tbody.length === 0) {
@@ -51,7 +43,7 @@ $(document).ready(function() {
             table.append(tbody);
         }
 
-        
+
         var row = '<tr>' +
             '<td>' + contador + '</td>' +
             '<td>' + nomeCompleto + '</td>' +
@@ -61,16 +53,14 @@ $(document).ready(function() {
             '<td>' + cidade + '</td>' +
             '<td>' + estado + '</td>' +
             '</tr>';
-
-        
         tbody.append(row);
         contador++;
         $('form')[0].reset();
     });
 });
-        
 
-    
+
+
 
 
 
