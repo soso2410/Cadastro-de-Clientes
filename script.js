@@ -1,9 +1,14 @@
 $(document).ready(function () {
 
     $('#cep').mask('00000-000');
+    $('#endereco, #bairro, #cidade, #estado').prop('readonly', true);
+
+    var cepValido = false;
 
     $('#cep').on('blur', function () {
         var cep = $(this).val().replace(/\D/g, '');
+
+        cepValido = false;
 
         if (cep.length === 8) {
             $.ajax({
@@ -16,22 +21,52 @@ $(document).ready(function () {
                         $('#bairro').val(data.bairro || '');
                         $('#cidade').val(data.localidade || '');
                         $('#estado').val(data.uf || '');
+                        cepValido = true;
+                    } else {
+
+                        $('#endereco').val('');
+                        $('#bairro').val('');
+                        $('#cidade').val('');
+                        $('#estado').val('');
+                        alert('CEP inválido. Verifique e tente novamente.');
                     }
+                },
+                error: function () {
+
+                    $('#endereco').val('');
+                    $('#bairro').val('');
+                    $('#cidade').val('');
+                    $('#estado').val('');
+                    alert('Erro ao consultar CEP. Tente novamente.');
                 }
             });
+        } else {
+
+            $('#endereco').val('');
+            $('#bairro').val('');
+            $('#cidade').val('');
+            $('#estado').val('');
+            if (cep.length > 0) {
+                alert('CEP deve ter 8 dígitos.');
+            }
         }
     });
-
 
     var contador = 1;
     $('form').on('submit', function (e) {
         e.preventDefault();
+
+        if (!cepValido) {
+            alert('CEP inválido. Não é possível cadastrar o cliente.');
+            return;
+        }
+
         var nome = $('#nome').val();
         var sobrenome = $('#sobrenome').val();
         var nomeCompleto = nome + ' ' + sobrenome;
         var endereco = $('#endereco').val();
         var numero = $('#numero').val();
-        var enderecoCompleto = endereco + (numero ? ', ' + numero : ''); // Junta endereço e número, se houver
+        var enderecoCompleto = endereco + (numero ? ', ' + numero : '');
         var cep = $('#cep').val();
         var bairro = $('#bairro').val();
         var cidade = $('#cidade').val();
@@ -42,7 +77,6 @@ $(document).ready(function () {
             tbody = $('<tbody></tbody>');
             table.append(tbody);
         }
-
 
         var row = '<tr>' +
             '<td>' + contador + '</td>' +
@@ -56,6 +90,7 @@ $(document).ready(function () {
         tbody.append(row);
         contador++;
         $('form')[0].reset();
+        cepValido = false;
     });
 });
 
